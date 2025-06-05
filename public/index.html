@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Video Chat Platform</title>
+    <title>Meet World - Live Video Chat</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="alternate icon" href="/favicon.ico">
     <style>
@@ -20,30 +20,38 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 10px;
+            margin: 0;
         }
 
         .container {
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            padding: 30px;
+            padding: 20px;
             max-width: 1200px;
-            width: 90%;
+            width: 100%;
+            max-height: 95vh;
+            overflow-y: auto;
         }
 
         h1 {
             text-align: center;
             color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
             font-weight: 300;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .video-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         .video-wrapper {
@@ -52,6 +60,7 @@
             border-radius: 15px;
             overflow: hidden;
             aspect-ratio: 4/3;
+            min-height: 200px;
         }
 
         video {
@@ -62,32 +71,37 @@
 
         .video-label {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.8);
             color: white;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
         }
 
         .controls {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 10px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
+            padding: 0 10px;
         }
 
         button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 25px;
+            padding: 12px 20px;
             border-radius: 25px;
-            font-size: 1em;
+            font-size: 0.9rem;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
+            min-width: 120px;
+            white-space: nowrap;
         }
 
         button:hover {
@@ -99,6 +113,12 @@
             background: #ccc;
             cursor: not-allowed;
             transform: none;
+        }
+
+        #debugBtn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            font-size: 0.8rem;
+            min-width: 100px;
         }
 
         .status {
@@ -127,8 +147,8 @@
         .chat-container {
             background: #f8f9fa;
             border-radius: 15px;
-            padding: 20px;
-            height: 300px;
+            padding: 15px;
+            height: clamp(250px, 30vh, 350px);
             display: flex;
             flex-direction: column;
         }
@@ -136,39 +156,44 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             padding: 10px;
             background: white;
             border-radius: 10px;
+            scroll-behavior: smooth;
         }
 
         .message {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             padding: 8px 12px;
             border-radius: 15px;
-            max-width: 80%;
+            max-width: 85%;
+            word-wrap: break-word;
+            font-size: 0.9rem;
         }
 
         .message.system {
             background: #e9ecef;
             color: #495057;
             font-style: italic;
+            font-size: 0.8rem;
+            max-width: 100%;
         }
 
         .message.user {
-            background: #007bff;
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
             color: white;
             margin-left: auto;
         }
 
         .message.partner {
-            background: #28a745;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
         }
 
         .chat-input-container {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
 
         .chat-input {
@@ -177,7 +202,8 @@
             border: 2px solid #dee2e6;
             border-radius: 20px;
             outline: none;
-            font-size: 1em;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
         }
 
         .chat-input:focus {
@@ -185,29 +211,130 @@
         }
 
         .send-btn {
-            padding: 10px 20px;
+            padding: 10px 18px;
             border-radius: 20px;
+            min-width: auto;
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                margin: 5px;
+                border-radius: 15px;
+                max-height: 98vh;
+            }
+
             .video-container {
                 grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 15px;
+            }
+            
+            .video-wrapper {
+                min-height: 180px;
             }
             
             .controls {
-                flex-direction: column;
-                align-items: center;
+                gap: 8px;
+                padding: 0 5px;
             }
             
             button {
-                width: 200px;
+                padding: 10px 16px;
+                font-size: 0.8rem;
+                min-width: 100px;
+            }
+
+            #debugBtn {
+                font-size: 0.7rem;
+                min-width: 80px;
+                padding: 8px 12px;
+            }
+
+            .chat-container {
+                padding: 12px;
+                height: clamp(200px, 25vh, 280px);
+            }
+
+            .message {
+                font-size: 0.85rem;
+                max-width: 90%;
+            }
+
+            .chat-input {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+
+            .send-btn {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+                margin: 2px;
+            }
+
+            h1 {
+                margin-bottom: 15px;
+                font-size: 1.6rem;
+            }
+
+            .video-wrapper {
+                min-height: 150px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 6px;
+            }
+            
+            button {
+                width: 100%;
+                max-width: 200px;
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            #debugBtn {
+                max-width: 120px;
+                font-size: 0.8rem;
+            }
+
+            .chat-container {
+                height: clamp(180px, 22vh, 240px);
+                padding: 10px;
+            }
+
+            .video-label {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+            }
+        }
+
+        @media (max-height: 600px) and (orientation: landscape) {
+            .container {
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+
+            .video-wrapper {
+                min-height: 120px;
+            }
+
+            .chat-container {
+                height: 200px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🎥 Live Video Chat</h1>
+        <h1>🌍 Meet World</h1>
         
         <div id="status" class="status disconnected">
             Click "Start Chat" to begin
@@ -228,7 +355,7 @@
             <button id="startChatBtn">Start Chat</button>
             <button id="nextChatBtn" disabled>Next Partner</button>
             <button id="stopChatBtn" disabled>Stop Chat</button>
-            <button id="debugBtn" style="background: #28a745;">Debug Info</button>
+            <button id="debugBtn">Debug Info</button>
         </div>
 
         <div class="chat-container">
@@ -622,7 +749,7 @@
 
         // Initial status
         updateStatus('Click "Start Chat" to begin', 'disconnected');
-        addChatMessage('Welcome to Live Video Chat! Click "Start Chat" to find a partner.');
+        addChatMessage('Welcome to Meet World! Connect with people from around the globe. Click "Start Chat" to find a partner.');
         
         // Test API connection when page loads
         testApiConnection();

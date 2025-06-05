@@ -1,13 +1,14 @@
-# Live Video Chat Platform
+# Meet World
 
-A real-time video chat platform built with Node.js, Express, and WebRTC.
+Connect with people from around the globe through live video chat.
 
 ## Features
 
-- 🎥 Video chat with random partners
+- 🌍 Connect with random partners worldwide
+- 🎥 High-quality video chat with WebRTC
 - 💬 Real-time text messaging
-- 🔄 Skip to next partner
-- 📱 Mobile-responsive design
+- 🔄 Skip to next partner instantly
+- 📱 Fully mobile-responsive design
 - ⚡ HTTP-based signaling (no WebSocket dependency)
 
 ## Local Development

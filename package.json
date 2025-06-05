@@ -1,7 +1,7 @@
 {
-  "name": "video-chat-fresh",
+  "name": "meet-world",
   "version": "1.0.0",
-  "description": "Live video chat platform - Railway deployment",
+  "description": "Meet World - Connect with people from around the globe through live video chat",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
