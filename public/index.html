@@ -364,6 +364,12 @@
                 remoteVideo.srcObject = event.streams[0];
                 addChatMessage('Partner: Connected!');
                 updateStatus('Connected to partner', 'connected');
+                
+                // Ensure chat is enabled for both users when video connection is established
+                debugLog('Video connection established, ensuring chat is enabled');
+                nextChatBtn.disabled = false;
+                chatInput.disabled = false;
+                sendChatBtn.disabled = false;
             };
 
             if (localStream) {
@@ -576,8 +582,17 @@
                         answer: answer
                     }
                 });
+                
+                // Enable chat for the person receiving the offer
+                debugLog('Received offer, enabling chat functionality');
+                nextChatBtn.disabled = false;
+                chatInput.disabled = false;
+                sendChatBtn.disabled = false;
+                
             } else if (signal.type === 'answer') {
                 await peerConnection.setRemoteDescription(signal.answer);
+                debugLog('Received answer, connection should be established');
+                
             } else if (signal.type === 'ice-candidate') {
                 await peerConnection.addIceCandidate(signal.candidate);
             }
