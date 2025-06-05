@@ -1,10 +1,11 @@
 {
   "name": "video-chat-fresh",
   "version": "1.0.0",
-  "description": "Live video chat platform - fresh deployment",
-  "main": "index.js",
+  "description": "Live video chat platform - Railway deployment",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
+    "dev": "node server.js",
     "build": "echo 'No build step required'"
   },
   "dependencies": {

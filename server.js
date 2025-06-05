@@ -7,6 +7,15 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static('public'));
 
+// Health check endpoint for Railway
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'healthy', 
+        timestamp: new Date().toISOString(),
+        port: PORT 
+    });
+});
+
 // API route with dynamic import for ES module
 app.all('/api/chat', async (req, res) => {
   try {
@@ -23,7 +32,9 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log(`Open http://localhost:${PORT} to use the video chat`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📱 Open http://localhost:${PORT} to use the video chat`);
+    console.log(`🏥 Health check available at http://localhost:${PORT}/health`);
 });

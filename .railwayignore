@@ -1,0 +1,10 @@
+# Railway ignore file
+.git
+.gitignore
+README.md
+.DS_Store
+*.log
+node_modules/.cache
+.env.local
+.env.development
+vercel.json
