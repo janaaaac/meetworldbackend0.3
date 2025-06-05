@@ -523,7 +523,7 @@
                 const signalsResult = await apiCall('getSignals');
                 if (signalsResult.signals) {
                     for (const signalData of signalsResult.signals) {
-                        await handleSignal(signalData.signal);
+                        await handleSignal(signalData); // Pass the complete signalData object
                     }
                 }
                 
@@ -568,8 +568,17 @@
             }
         }
 
-        async function handleSignal(signal) {
+        async function handleSignal(signalData) {
             if (!peerConnection) return;
+            
+            const signal = signalData.signal;
+            const senderId = signalData.from;
+            
+            // Set partnerId if not already set
+            if (!partnerId && senderId) {
+                partnerId = senderId;
+                debugLog(`Partner ID set to: ${partnerId}`);
+            }
             
             if (signal.type === 'offer') {
                 await peerConnection.setRemoteDescription(signal.offer);
