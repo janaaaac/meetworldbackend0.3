@@ -2,7 +2,7 @@
 const users = new Map();
 let waitingUser = null;
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   try {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -157,3 +157,5 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 }
+
+module.exports = handler;

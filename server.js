@@ -16,10 +16,10 @@ app.get('/health', (req, res) => {
     });
 });
 
-// API route with dynamic import for ES module
+// API route with CommonJS require
 app.all('/api/chat', async (req, res) => {
   try {
-    const { default: chatHandler } = await import('./api/chat.js');
+    const chatHandler = require('./api/chat.js');
     return await chatHandler(req, res);
   } catch (error) {
     console.error('API Handler Error:', error);
