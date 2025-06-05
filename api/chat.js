@@ -93,8 +93,13 @@ async function handler(req, res) {
 
         case 'chatMessage':
           const senderUser = users.get(userId);
+          console.log(`Chat message from ${userId}: "${data.message}"`);
+          console.log(`Sender exists: ${!!senderUser}, Partner: ${senderUser?.partner}`);
+          
           if (senderUser && senderUser.partner) {
             const partnerUser = users.get(senderUser.partner);
+            console.log(`Partner exists: ${!!partnerUser}`);
+            
             if (partnerUser) {
               if (!partnerUser.messages) partnerUser.messages = [];
               partnerUser.messages.push({
@@ -102,18 +107,29 @@ async function handler(req, res) {
                 message: data.message,
                 timestamp: Date.now()
               });
+              console.log(`Message queued for partner ${senderUser.partner}`);
+              res.status(200).json({ success: true, messageQueued: true });
+            } else {
+              console.log(`Partner ${senderUser.partner} not found in users map`);
+              res.status(200).json({ success: false, error: 'Partner not found' });
             }
+          } else {
+            console.log(`Sender ${userId} has no partner or doesn't exist`);
+            res.status(200).json({ success: false, error: 'No partner or user not found' });
           }
-          res.status(200).json({ success: true });
           break;
 
         case 'getMessages':
           const msgUser = users.get(userId);
-          if (msgUser && msgUser.messages) {
+          console.log(`Getting messages for ${userId}, user exists: ${!!msgUser}`);
+          
+          if (msgUser && msgUser.messages && msgUser.messages.length > 0) {
             const messages = msgUser.messages;
-            msgUser.messages = [];
+            msgUser.messages = []; // Clear messages after retrieving
+            console.log(`Returning ${messages.length} messages for ${userId}`);
             res.status(200).json({ messages });
           } else {
+            console.log(`No messages for ${userId}`);
             res.status(200).json({ messages: [] });
           }
           break;
@@ -144,6 +160,22 @@ async function handler(req, res) {
           } else {
             res.status(200).json({ events: [] });
           }
+          break;
+
+        case 'debug':
+          const debugUser = users.get(userId);
+          const debugInfo = {
+            userId,
+            userExists: !!debugUser,
+            partner: debugUser?.partner || null,
+            partnerExists: debugUser?.partner ? !!users.get(debugUser.partner) : false,
+            messageCount: debugUser?.messages?.length || 0,
+            signalCount: debugUser?.signals?.length || 0,
+            totalUsers: users.size,
+            waitingUser: waitingUser
+          };
+          console.log('Debug info:', debugInfo);
+          res.status(200).json(debugInfo);
           break;
 
         default:

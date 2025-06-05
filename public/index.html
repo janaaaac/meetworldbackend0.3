@@ -228,6 +228,7 @@
             <button id="startChatBtn">Start Chat</button>
             <button id="nextChatBtn" disabled>Next Partner</button>
             <button id="stopChatBtn" disabled>Stop Chat</button>
+            <button id="debugBtn" style="background: #28a745;">Debug Info</button>
         </div>
 
         <div class="chat-container">
@@ -251,6 +252,7 @@
         const chatMessages = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendChatBtn = document.getElementById('sendChatBtn');
+        const debugBtn = document.getElementById('debugBtn');
 
         let localStream;
         let peerConnection;
@@ -479,11 +481,22 @@
 
         async function sendMessage() {
             const message = chatInput.value.trim();
-            if (!message || !partnerId) return;
+            if (!message || !partnerId) {
+                debugLog(`Cannot send message: message="${message}", partnerId="${partnerId}"`);
+                return;
+            }
             
-            await apiCall('chatMessage', { message });
-            addChatMessage(`You: ${message}`, 'user');
-            chatInput.value = '';
+            debugLog(`Sending message: "${message}" to partner: ${partnerId}`);
+            const result = await apiCall('chatMessage', { message });
+            
+            if (result.success) {
+                addChatMessage(`You: ${message}`, 'user');
+                chatInput.value = '';
+                debugLog(`Message sent successfully`);
+            } else {
+                debugLog(`Message send failed: ${result.error || 'Unknown error'}`);
+                addChatMessage(`System: Failed to send message - ${result.error || 'Unknown error'}`, 'system');
+            }
         }
 
         function startPolling() {
@@ -510,7 +523,8 @@
                 
                 // Get chat messages
                 const messagesResult = await apiCall('getMessages');
-                if (messagesResult.messages) {
+                if (messagesResult.messages && messagesResult.messages.length > 0) {
+                    debugLog(`Received ${messagesResult.messages.length} messages from partner`);
                     for (const msgData of messagesResult.messages) {
                         addChatMessage(`Partner: ${msgData.message}`, 'partner');
                     }
@@ -531,6 +545,21 @@
             }
             
             setTimeout(pollForUpdates, 1000);
+        }
+
+        // Debug function to show connection status
+        async function showDebugInfo() {
+            try {
+                const debugResult = await apiCall('debug');
+                debugLog(`User: ${debugResult.userId}`);
+                debugLog(`Partner: ${debugResult.partner || 'None'}`);
+                debugLog(`Partner exists: ${debugResult.partnerExists}`);
+                debugLog(`Messages waiting: ${debugResult.messageCount}`);
+                debugLog(`Total users: ${debugResult.totalUsers}`);
+                debugLog(`Waiting user: ${debugResult.waitingUser || 'None'}`);
+            } catch (error) {
+                debugLog(`Debug failed: ${error.message}`);
+            }
         }
 
         async function handleSignal(signal) {
@@ -559,6 +588,7 @@
         nextChatBtn.addEventListener('click', nextPartner);
         stopChatBtn.addEventListener('click', stopChat);
         sendChatBtn.addEventListener('click', sendMessage);
+        debugBtn.addEventListener('click', showDebugInfo);
 
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
