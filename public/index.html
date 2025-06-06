@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meet World - Connect with People Worldwide</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <!-- Cookie Consent System -->
+    <script src="/js/cookie-consent.js"></script>
     <style>
         * {
             margin: 0;
@@ -1617,6 +1619,7 @@
                     <ul>
                         <li><a href="privacy_policy.html">Privacy Policy</a></li>
                         <li><a href="meetworld_terms.html">Terms of Service</a></li>
+                        <li><a href="content_policy.html">Content Policy</a></li>
                         <!-- <li><a href="#">Cookie Policy</a></li>
                         <li><a href="#">DMCA</a></li> -->
                     </ul>
@@ -2026,6 +2029,14 @@
         // Add FAQ to navigation observer
         document.querySelectorAll('.faq-item').forEach(item => {
             observer.observe(item);
+        });
+
+        // Initialize Cookie Consent System
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof CookieConsent !== 'undefined') {
+                const cookieConsent = new CookieConsent();
+                console.log('🍪 Cookie Consent System Initialized');
+            }
         });
     </script>
 </body>
