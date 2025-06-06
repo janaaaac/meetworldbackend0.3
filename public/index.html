@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meet World - Connect with People Worldwide</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <!-- Cookie Consent System -->
-    <script src="/js/cookie-consent.js"></script>
     <style>
         * {
             margin: 0;
@@ -2030,12 +2028,18 @@
         document.querySelectorAll('.faq-item').forEach(item => {
             observer.observe(item);
         });
-
-        // Initialize Cookie Consent System
+    </script>
+    
+    <!-- Cookie Consent System -->
+    <script src="/js/cookie-consent.js"></script>
+    <script>
+        // Initialize Cookie Consent System after the script is loaded
         document.addEventListener('DOMContentLoaded', function() {
             if (typeof CookieConsent !== 'undefined') {
-                const cookieConsent = new CookieConsent();
+                window.cookieConsent = new CookieConsent();
                 console.log('🍪 Cookie Consent System Initialized');
+            } else {
+                console.error('❌ CookieConsent class not found');
             }
         });
     </script>

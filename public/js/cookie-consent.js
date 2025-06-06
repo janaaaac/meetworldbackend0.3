@@ -36,7 +36,7 @@ class CookieConsent {
                 <div class="cookie-consent-modal">
                     <div class="cookie-consent-header">
                         <h3>🍪 Cookie Preferences</h3>
-                        <button class="cookie-close" onclick="cookieConsent.hideConsentBanner()">&times;</button>
+                        <button class="cookie-close" id="cookie-close-btn">&times;</button>
                     </div>
                     <div class="cookie-consent-content">
                         <p>We use cookies to enhance your experience and show relevant advertisements. Choose your preferences:</p>
@@ -77,9 +77,9 @@ class CookieConsent {
                         </div>
                     </div>
                     <div class="cookie-consent-actions">
-                        <button class="cookie-btn cookie-btn-secondary" onclick="cookieConsent.acceptEssential()">Essential Only</button>
-                        <button class="cookie-btn cookie-btn-primary" onclick="cookieConsent.acceptAll()">Accept All</button>
-                        <button class="cookie-btn cookie-btn-outline" onclick="cookieConsent.savePreferences()">Save Preferences</button>
+                        <button class="cookie-btn cookie-btn-secondary" id="accept-essential-btn">Essential Only</button>
+                        <button class="cookie-btn cookie-btn-primary" id="accept-all-btn">Accept All</button>
+                        <button class="cookie-btn cookie-btn-outline" id="save-preferences-btn">Save Preferences</button>
                     </div>
                     <div class="cookie-consent-footer">
                         <p><a href="privacy_policy.html">Privacy Policy</a> | <a href="meetworld_terms.html">Terms of Service</a></p>
@@ -90,6 +90,7 @@ class CookieConsent {
 
         document.body.appendChild(banner);
         this.addConsentStyles();
+        this.attachEventListeners();
     }
 
     hideConsentBanner() {
@@ -466,6 +467,42 @@ class CookieConsent {
         document.head.appendChild(styles);
     }
 
+    attachEventListeners() {
+        // Close button
+        const closeBtn = document.getElementById('cookie-close-btn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => this.hideConsentBanner());
+        }
+
+        // Accept All button
+        const acceptAllBtn = document.getElementById('accept-all-btn');
+        if (acceptAllBtn) {
+            acceptAllBtn.addEventListener('click', () => this.acceptAll());
+        }
+
+        // Essential Only button
+        const acceptEssentialBtn = document.getElementById('accept-essential-btn');
+        if (acceptEssentialBtn) {
+            acceptEssentialBtn.addEventListener('click', () => this.acceptEssential());
+        }
+
+        // Save Preferences button
+        const savePreferencesBtn = document.getElementById('save-preferences-btn');
+        if (savePreferencesBtn) {
+            savePreferencesBtn.addEventListener('click', () => this.savePreferences());
+        }
+
+        // Close modal when clicking overlay (but not the modal itself)
+        const overlay = document.querySelector('.cookie-consent-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    this.hideConsentBanner();
+                }
+            });
+        }
+    }
+
     // Method to show cookie preferences again
     showPreferences() {
         this.showConsentBanner();
@@ -480,15 +517,9 @@ class CookieConsent {
     }
 }
 
-// Initialize cookie consent when DOM is loaded
-let cookieConsent;
-document.addEventListener('DOMContentLoaded', () => {
-    cookieConsent = new CookieConsent();
-});
-
 // Global function to show cookie preferences
 function showCookiePreferences() {
-    if (cookieConsent) {
-        cookieConsent.showPreferences();
+    if (window.cookieConsent) {
+        window.cookieConsent.showPreferences();
     }
 }
