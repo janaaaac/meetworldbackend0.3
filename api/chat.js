@@ -2,6 +2,37 @@
 const users = new Map();
 let waitingUser = null;
 
+// Simple rate limiting - track requests per user
+const userRequests = new Map();
+const RATE_LIMIT_WINDOW = 10000; // 10 seconds
+const MAX_REQUESTS_PER_WINDOW = 50; // 50 requests per 10 seconds
+
+function checkRateLimit(userId) {
+  const now = Date.now();
+  
+  if (!userRequests.has(userId)) {
+    userRequests.set(userId, { count: 1, windowStart: now });
+    return true;
+  }
+  
+  const userStats = userRequests.get(userId);
+  
+  // Reset window if enough time has passed
+  if (now - userStats.windowStart > RATE_LIMIT_WINDOW) {
+    userStats.count = 1;
+    userStats.windowStart = now;
+    return true;
+  }
+  
+  // Check if user has exceeded limit
+  if (userStats.count >= MAX_REQUESTS_PER_WINDOW) {
+    return false;
+  }
+  
+  userStats.count++;
+  return true;
+}
+
 async function handler(req, res) {
   try {
     // Enable CORS
@@ -30,6 +61,15 @@ async function handler(req, res) {
       
       if (!userId) {
         res.status(400).json({ error: 'userId required' });
+        return;
+      }
+
+      // Check rate limit
+      if (!checkRateLimit(userId)) {
+        res.status(429).json({ 
+          error: 'Too many requests. Please slow down.',
+          retryAfter: Math.ceil(RATE_LIMIT_WINDOW / 1000)
+        });
         return;
       }
 
@@ -160,6 +200,38 @@ async function handler(req, res) {
           } else {
             res.status(200).json({ events: [] });
           }
+          break;
+
+        case 'batchUpdate':
+          // Batch endpoint that returns signals, messages, and events in one call
+          const batchUser = users.get(userId);
+          const batchResult = {
+            signals: [],
+            messages: [],
+            events: []
+          };
+          
+          if (batchUser) {
+            // Get signals
+            if (batchUser.signals) {
+              batchResult.signals = batchUser.signals;
+              batchUser.signals = [];
+            }
+            
+            // Get messages
+            if (batchUser.messages && batchUser.messages.length > 0) {
+              batchResult.messages = batchUser.messages;
+              batchUser.messages = [];
+            }
+            
+            // Get events
+            if (batchUser.events) {
+              batchResult.events = batchUser.events;
+              batchUser.events = [];
+            }
+          }
+          
+          res.status(200).json(batchResult);
           break;
 
         case 'debug':

@@ -447,41 +447,60 @@
             polling = false;
         }
 
+        // Polling with exponential backoff to handle rate limiting
+        let pollInterval = 2000; // Start with 2 seconds
+        let consecutiveErrors = 0;
+        const maxInterval = 10000; // Max 10 seconds
+        const minInterval = 2000; // Min 2 seconds
+        
         async function pollForUpdates() {
             if (!polling) return;
             
             try {
-                // Get WebRTC signals
-                const signalsResult = await apiCall('getSignals');
-                if (signalsResult.signals) {
-                    for (const signalData of signalsResult.signals) {
+                // Use batch endpoint to get all updates in one request
+                const batchResult = await apiCall('batchUpdate');
+                
+                // Handle WebRTC signals
+                if (batchResult.signals && batchResult.signals.length > 0) {
+                    for (const signalData of batchResult.signals) {
                         await handleSignal(signalData.signal);
                     }
                 }
                 
-                // Get chat messages
-                const messagesResult = await apiCall('getMessages');
-                if (messagesResult.messages) {
-                    for (const msgData of messagesResult.messages) {
+                // Handle chat messages
+                if (batchResult.messages && batchResult.messages.length > 0) {
+                    for (const msgData of batchResult.messages) {
                         addChatMessage(`Partner: ${msgData.message}`, 'partner');
                     }
                 }
                 
-                // Get events (like partner disconnect)
-                const eventsResult = await apiCall('getEvents');
-                if (eventsResult.events) {
-                    for (const event of eventsResult.events) {
+                // Handle events (like partner disconnect)
+                if (batchResult.events && batchResult.events.length > 0) {
+                    for (const event of batchResult.events) {
                         if (event.type === 'partnerDisconnected') {
                             addChatMessage('System: Partner disconnected');
                             await nextPartner();
                         }
                     }
                 }
+                
+                // Reset interval on success
+                consecutiveErrors = 0;
+                pollInterval = minInterval;
+                
             } catch (error) {
                 console.error('Polling error:', error);
+                
+                // Handle rate limiting specifically
+                if (error.message.includes('429') || error.message.includes('Too Many Requests')) {
+                    consecutiveErrors++;
+                    pollInterval = Math.min(pollInterval * 2, maxInterval);
+                    console.log(`Rate limited, backing off to ${pollInterval}ms`);
+                    addChatMessage('System: Slowing down requests to avoid rate limiting');
+                }
             }
             
-            setTimeout(pollForUpdates, 1000);
+            setTimeout(pollForUpdates, pollInterval);
         }
 
         async function handleSignal(signal) {

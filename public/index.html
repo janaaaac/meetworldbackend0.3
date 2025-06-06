@@ -1617,7 +1617,6 @@
                     <ul>
                         <li><a href="privacy_policy.html">Privacy Policy</a></li>
                         <li><a href="meetworld_terms.html">Terms of Service</a></li>
-                        <li><a href="content_policy.html">Content Policy</a></li>
                         <!-- <li><a href="#">Cookie Policy</a></li>
                         <li><a href="#">DMCA</a></li> -->
                     </ul>
@@ -2027,20 +2026,6 @@
         // Add FAQ to navigation observer
         document.querySelectorAll('.faq-item').forEach(item => {
             observer.observe(item);
-        });
-    </script>
-    
-    <!-- Cookie Consent System -->
-    <script src="/js/cookie-consent.js"></script>
-    <script>
-        // Initialize Cookie Consent System after the script is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof CookieConsent !== 'undefined') {
-                window.cookieConsent = new CookieConsent();
-                console.log('🍪 Cookie Consent System Initialized');
-            } else {
-                console.error('❌ CookieConsent class not found');
-            }
         });
     </script>
 </body>
