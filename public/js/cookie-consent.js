@@ -4,10 +4,14 @@ class CookieConsent {
         this.consentKey = 'meetworld_cookie_consent';
         this.analyticsKey = 'meetworld_analytics_consent';
         this.adsKey = 'meetworld_ads_consent';
+        this.eventListenersAttached = false;
         this.init();
     }
 
     init() {
+        // Set up global event listeners once
+        this.attachEventListeners();
+        
         // Check if consent has already been given
         if (!this.hasConsent()) {
             this.showConsentBanner();
@@ -91,10 +95,7 @@ class CookieConsent {
         document.body.appendChild(banner);
         this.addConsentStyles();
         
-        // Use setTimeout to ensure DOM is fully ready before attaching events
-        setTimeout(() => {
-            this.attachEventListeners();
-        }, 50);
+        console.log('🍪 Cookie consent banner displayed');
     }
 
     hideConsentBanner() {
@@ -483,39 +484,49 @@ class CookieConsent {
     }
 
     attachEventListeners() {
+        // Only attach global event listeners once
+        if (this.eventListenersAttached) {
+            console.log('🔗 Event listeners already attached, skipping...');
+            return;
+        }
+        
         console.log('🔗 Attaching event listeners...');
         
+        // Bind this context to preserve it in the event handler
+        const self = this;
+        
         // Use event delegation from document level to ensure events work
-        document.addEventListener('click', (e) => {
+        document.addEventListener('click', function(e) {
             if (e.target.id === 'cookie-close-btn') {
                 console.log('🔴 Close button clicked via delegation');
                 e.preventDefault();
                 e.stopPropagation();
-                this.hideConsentBanner();
+                self.hideConsentBanner();
             } else if (e.target.id === 'accept-all-btn') {
                 console.log('🟢 Accept All button clicked via delegation');
                 e.preventDefault();
                 e.stopPropagation();
-                this.acceptAll();
+                self.acceptAll();
             } else if (e.target.id === 'accept-essential-btn') {
                 console.log('🟡 Essential Only button clicked via delegation');
                 e.preventDefault();
                 e.stopPropagation();
-                this.acceptEssential();
+                self.acceptEssential();
             } else if (e.target.id === 'save-preferences-btn') {
                 console.log('🔵 Save Preferences button clicked via delegation');
                 e.preventDefault();
                 e.stopPropagation();
-                this.savePreferences();
-            } else if (e.target.classList.contains('cookie-consent-overlay') && e.target === e.currentTarget) {
+                self.savePreferences();
+            } else if (e.target.classList.contains('cookie-consent-overlay')) {
                 console.log('🔴 Overlay clicked - closing modal');
-                this.hideConsentBanner();
+                self.hideConsentBanner();
             }
         });
         
+        this.eventListenersAttached = true;
         console.log('✅ Event delegation listeners attached to document');
         
-        // Also try direct listeners as backup
+        // Also try direct listeners as backup after a short delay
         setTimeout(() => {
             const closeBtn = document.getElementById('cookie-close-btn');
             const acceptAllBtn = document.getElementById('accept-all-btn');
@@ -528,6 +539,43 @@ class CookieConsent {
                 acceptEssentialBtn: !!acceptEssentialBtn,
                 savePreferencesBtn: !!savePreferencesBtn
             });
+            
+            // Direct listeners as backup
+            if (acceptAllBtn) {
+                acceptAllBtn.addEventListener('click', function(e) {
+                    console.log('🟢 Accept All button clicked via direct listener');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.acceptAll();
+                });
+            }
+            
+            if (acceptEssentialBtn) {
+                acceptEssentialBtn.addEventListener('click', function(e) {
+                    console.log('🟡 Essential Only button clicked via direct listener');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.acceptEssential();
+                });
+            }
+            
+            if (savePreferencesBtn) {
+                savePreferencesBtn.addEventListener('click', function(e) {
+                    console.log('🔵 Save Preferences button clicked via direct listener');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.savePreferences();
+                });
+            }
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function(e) {
+                    console.log('🔴 Close button clicked via direct listener');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.hideConsentBanner();
+                });
+            }
         }, 100);
         
         console.log('🔗 Event listeners attachment completed');
