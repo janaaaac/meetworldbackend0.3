@@ -90,7 +90,11 @@ class CookieConsent {
 
         document.body.appendChild(banner);
         this.addConsentStyles();
-        this.attachEventListeners();
+        
+        // Use setTimeout to ensure DOM is fully ready before attaching events
+        setTimeout(() => {
+            this.attachEventListeners();
+        }, 50);
     }
 
     hideConsentBanner() {
@@ -101,29 +105,37 @@ class CookieConsent {
     }
 
     acceptAll() {
+        console.log('🎯 acceptAll() method called');
         localStorage.setItem(this.consentKey, 'true');
         localStorage.setItem(this.analyticsKey, 'true');
         localStorage.setItem(this.adsKey, 'true');
+        console.log('💾 All cookie preferences saved to localStorage');
         this.hideConsentBanner();
         this.loadConsentedServices();
         this.showConsentConfirmation('All cookies accepted. Thank you!');
     }
 
     acceptEssential() {
+        console.log('🎯 acceptEssential() method called');
         localStorage.setItem(this.consentKey, 'true');
         localStorage.setItem(this.analyticsKey, 'false');
         localStorage.setItem(this.adsKey, 'false');
+        console.log('💾 Essential only preferences saved to localStorage');
         this.hideConsentBanner();
         this.showConsentConfirmation('Essential cookies only. You can change this anytime.');
     }
 
     savePreferences() {
+        console.log('🎯 savePreferences() method called');
         const analytics = document.getElementById('analytics-cookies').checked;
         const advertising = document.getElementById('advertising-cookies').checked;
+        console.log('📊 Analytics consent:', analytics);
+        console.log('🎯 Advertising consent:', advertising);
 
         localStorage.setItem(this.consentKey, 'true');
         localStorage.setItem(this.analyticsKey, analytics.toString());
         localStorage.setItem(this.adsKey, advertising.toString());
+        console.log('💾 Custom preferences saved to localStorage');
         
         this.hideConsentBanner();
         this.loadConsentedServices();
@@ -383,6 +395,9 @@ class CookieConsent {
                 border: none;
                 font-size: 0.9rem;
                 min-width: 120px;
+                position: relative;
+                z-index: 10001;
+                pointer-events: auto;
             }
 
             .cookie-btn-primary {
@@ -468,39 +483,54 @@ class CookieConsent {
     }
 
     attachEventListeners() {
-        // Close button
-        const closeBtn = document.getElementById('cookie-close-btn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => this.hideConsentBanner());
-        }
-
-        // Accept All button
-        const acceptAllBtn = document.getElementById('accept-all-btn');
-        if (acceptAllBtn) {
-            acceptAllBtn.addEventListener('click', () => this.acceptAll());
-        }
-
-        // Essential Only button
-        const acceptEssentialBtn = document.getElementById('accept-essential-btn');
-        if (acceptEssentialBtn) {
-            acceptEssentialBtn.addEventListener('click', () => this.acceptEssential());
-        }
-
-        // Save Preferences button
-        const savePreferencesBtn = document.getElementById('save-preferences-btn');
-        if (savePreferencesBtn) {
-            savePreferencesBtn.addEventListener('click', () => this.savePreferences());
-        }
-
-        // Close modal when clicking overlay (but not the modal itself)
-        const overlay = document.querySelector('.cookie-consent-overlay');
-        if (overlay) {
-            overlay.addEventListener('click', (e) => {
-                if (e.target === overlay) {
-                    this.hideConsentBanner();
-                }
+        console.log('🔗 Attaching event listeners...');
+        
+        // Use event delegation from document level to ensure events work
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'cookie-close-btn') {
+                console.log('🔴 Close button clicked via delegation');
+                e.preventDefault();
+                e.stopPropagation();
+                this.hideConsentBanner();
+            } else if (e.target.id === 'accept-all-btn') {
+                console.log('🟢 Accept All button clicked via delegation');
+                e.preventDefault();
+                e.stopPropagation();
+                this.acceptAll();
+            } else if (e.target.id === 'accept-essential-btn') {
+                console.log('🟡 Essential Only button clicked via delegation');
+                e.preventDefault();
+                e.stopPropagation();
+                this.acceptEssential();
+            } else if (e.target.id === 'save-preferences-btn') {
+                console.log('🔵 Save Preferences button clicked via delegation');
+                e.preventDefault();
+                e.stopPropagation();
+                this.savePreferences();
+            } else if (e.target.classList.contains('cookie-consent-overlay') && e.target === e.currentTarget) {
+                console.log('🔴 Overlay clicked - closing modal');
+                this.hideConsentBanner();
+            }
+        });
+        
+        console.log('✅ Event delegation listeners attached to document');
+        
+        // Also try direct listeners as backup
+        setTimeout(() => {
+            const closeBtn = document.getElementById('cookie-close-btn');
+            const acceptAllBtn = document.getElementById('accept-all-btn');
+            const acceptEssentialBtn = document.getElementById('accept-essential-btn');
+            const savePreferencesBtn = document.getElementById('save-preferences-btn');
+            
+            console.log('📍 Button elements found:', {
+                closeBtn: !!closeBtn,
+                acceptAllBtn: !!acceptAllBtn,
+                acceptEssentialBtn: !!acceptEssentialBtn,
+                savePreferencesBtn: !!savePreferencesBtn
             });
-        }
+        }, 100);
+        
+        console.log('🔗 Event listeners attachment completed');
     }
 
     // Method to show cookie preferences again
